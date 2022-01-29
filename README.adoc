@@ -1,0 +1,173 @@
+= Lab Database normalization
+:stylesheet: boot-darkly.css
+:linkcss: boot-darkly.css
+:image-url-ironhack: https://user-images.githubusercontent.com/23629340/40541063-a07a0a8a-601a-11e8-91b5-2f13e4e6b441.png
+:my-name: Jorge Castro DAPT NOV2021
+:description:
+:script-url:
+//:fn-xxx: Add the explanation foot note here bla bla
+:toc:
+:toc-title: 
+:toc-placement!:
+:toclevels: 5
+ifdef::env-github[]
+:sectnums:
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:experimental:
+:table-caption!:
+:example-caption!:
+:figure-caption!:
+:idprefix:
+:idseparator: -
+:linkattrs:
+:fontawesome-ref: http://fortawesome.github.io/Font-Awesome
+:icon-inline: {user-ref}/#inline-icons
+:icon-attribute: {user-ref}/#size-rotate-and-flip
+:video-ref: {user-ref}/#video
+:checklist-ref: {user-ref}/#checklists
+:list-marker: {user-ref}/#custom-markers
+:list-number: {user-ref}/#numbering-styles
+:imagesdir-ref: {user-ref}/#imagesdir
+:image-attributes: {user-ref}/#put-images-in-their-place
+:toc-ref: {user-ref}/#table-of-contents
+:para-ref: {user-ref}/#paragraph
+:literal-ref: {user-ref}/#literal-text-and-blocks
+:admon-ref: {user-ref}/#admonition
+:bold-ref: {user-ref}/#bold-and-italic
+:quote-ref: {user-ref}/#quotation-marks-and-apostrophes
+:sub-ref: {user-ref}/#subscript-and-superscript
+:mono-ref: {user-ref}/#monospace
+:css-ref: {user-ref}/#custom-styling-with-attributes
+:pass-ref: {user-ref}/#passthrough-macros
+endif::[]
+ifndef::env-github[]
+:imagesdir: ./
+endif::[]
+
+image::{image-url-ironhack}[width=70]
+
+{my-name}
+
+
+                                                     
+====
+''''
+====
+toc::[]
+
+{description}
+
+
+== Instructions:
+
+=== Use dbdiagram.io or draw.io to propose a new structure for the Sakila database.
+=== Define primary keys and foreign keys for the new database.
+
+Proposed solutions:
+
+Remove the duplicate rows of "film_text" from the table "film".
+
+In the "film" table, there are several ambiguous columns. Furthermore, the number of available languages is determined more by the copy version (i.e., inventory) than by film per se. Delete column "language_id" from the "film" table. Create columns "language_dub" and "language_subtitles" in the "inventory" table: FK for language id.
+
+The column "special_features" in the table "film" has more than one value per cell, despite the fact that it is a single-valued column. Create a new table named "special_content" with a boolean list of possible special features. Add boolean columns for "behind_scenes", "commentaries", "deleted_scenes", and "trailer," as well as the inventory id (FK inventory ID). This sort of material is not reliant on the film itself; rather, it is determined by the copy in the possession: FK inventory ID.
+
+The table "film" has numerous columns that refer to the pricing policy, which is not directly tied to the film. We must be able to alter our pricing strategy without affecting the "film" table in a normalized database. To identify each pricing strategy, CREATE a "pricing" table with a "princing_id" PK. Move column titles from "film" to "pricing." Create a FK in the "film" table for the "princing_id."
+
+The table "address" has a column called "phone." These data are connected to the address. Create the column "self_phone" in the customer table.
+
+
+====
+''''
+====
+
+{script-url}[Solutions script only]
+
+====
+''''
+====
+
+
+
+
+xref:Lab-xxxx[Top Section]
+
+xref:Last-section[Bottom section]
+
+bla bla blafootnote:[{fn-xxx}]
+
+
+////
+.Unordered list title
+* gagagagagaga
+** gagagatrtrtrzezeze
+*** zreu fhjdf hdrfj 
+*** hfbvbbvtrtrttrhc
+* rtez uezrue rjek  
+
+.Ordered list title
+. rwieuzr skjdhf
+.. weurthg kjhfdsk skhjdgf
+. djhfgsk skjdhfgs 
+.. lksjhfgkls ljdfhgkd
+... kjhfks sldfkjsdlk
+
+
+
+
+[,sql]
+----
+----
+
+
+
+[NOTE]
+====
+A sample note admonition.
+====
+ 
+TIP: It works!
+ 
+IMPORTANT: Asciidoctor is awesome, don't forget!
+ 
+CAUTION: Don't forget to add the `...-caption` document attributes in the header of the document on GitHub.
+ 
+WARNING: You have no reason not to use Asciidoctor.
+
+bla bla bla the 1NF or first normal form.footnote:[{1nf}]Then wen bla bla
+
+
+====
+- [*] checked
+- [x] also checked
+- [ ] not checked
+-     normal list item
+====
+[horizontal]
+CPU:: The brain of the computer.
+Hard drive:: Permanent storage for operating system and/or user files.
+RAM:: Temporarily stores information the CPU uses during operation.
+
+
+
+
+
+
+bold *constrained* & **un**constrained
+
+italic _constrained_ & __un__constrained
+
+bold italic *_constrained_* & **__un__**constrained
+
+monospace `constrained` & ``un``constrained
+
+monospace bold `*constrained*` & ``**un**``constrained
+
+monospace italic `_constrained_` & ``__un__``constrained
+
+monospace bold italic `*_constrained_*` & ``**__un__**``constrained
+
+////
