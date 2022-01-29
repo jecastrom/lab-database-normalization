@@ -69,6 +69,10 @@ toc::[]
 
 Proposed solutions:
 
+This is the original Sakila Database:
+
+image::https://user-images.githubusercontent.com/63274055/151679513-178e534e-e0c3-4f6f-9cc5-1460eb757ad1.png[width=400]
+
 Remove the duplicate rows of "film_text" from the table "film".
 
 In the "film" table, there are several ambiguous columns. Furthermore, the number of available languages is determined more by the copy version (i.e., inventory) than by film per se. Delete column "language_id" from the "film" table. Create columns "language_dub" and "language_subtitles" in the "inventory" table: FK for language id.
