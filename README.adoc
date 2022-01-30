@@ -81,7 +81,7 @@ To do this task I created the model with `MySQL Workbench` and generated the cod
 
 I have to remove the duplicate rows of "film_text" from the table "film".
 
-image::https://user-images.githubusercontent.com/63274055/151720292-aab4d817-383c-4cd1-a4e7-080cb75ec730.png[width=400]
+image::https://user-images.githubusercontent.com/63274055/151720292-aab4d817-383c-4cd1-a4e7-080cb75ec730.png[width=600]
 
 In the "film" table, there are several ambiguous columns. Furthermore, the number of available languages is determined more by the copy version (i.e., inventory) than by film itself. Delete column "language_id" from the "film" table. Create columns "dubbing_language" and "language_subtitles" in the "inventory" table: FK for language id.
 
