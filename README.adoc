@@ -1,10 +1,10 @@
-= Lab Database normalization
+= Lab Database Normalization
 :stylesheet: boot-darkly.css
 :linkcss: boot-darkly.css
 :image-url-ironhack: https://user-images.githubusercontent.com/23629340/40541063-a07a0a8a-601a-11e8-91b5-2f13e4e6b441.png
 :my-name: Jorge Castro DAPT NOV2021
 :description:
-:script-url:
+:new-sakila-edr: https://github.com/jecastrom/lab-database-normalization/files/7966677/new_sakila.pdf
 //:fn-xxx: Add the explanation foot note here bla bla
 :toc:
 :toc-title: 
@@ -73,15 +73,20 @@ This is the original Sakila Database:
 
 image::https://user-images.githubusercontent.com/63274055/151679513-178e534e-e0c3-4f6f-9cc5-1460eb757ad1.png[width=400]
 
+====
+''''
+====
 Remove the duplicate rows of "film_text" from the table "film".
 
-In the "film" table, there are several ambiguous columns. Furthermore, the number of available languages is determined more by the copy version (i.e., inventory) than by film per se. Delete column "language_id" from the "film" table. Create columns "dubbing_language" and "language_subtitles" in the "inventory" table: FK for language id.
+In the "film" table, there are several ambiguous columns. Furthermore, the number of available languages is determined more by the copy version (i.e., inventory) than by film itself. Delete column "language_id" from the "film" table. Create columns "dubbing_language" and "language_subtitles" in the "inventory" table: FK for language id.
 
 The column "special_features" in the table "film" has more than one value per cell, despite the fact that it is a single-valued column. Create a new table named "special_features" with a boolean list of possible special features. Add boolean columns for "behind_scenes", "commentaries", "deleted_scenes", and "trailer," as well as the inventory id (FK inventory ID). This sort of material is not reliant on the film itself; rather, it is determined by the copy in the possession: FK inventory ID.
 
 The table "film" has numerous columns that refer to the pricing policy, which is not directly tied to the film. A business must be able to alter its pricing strategy without affecting the "film" table in a normalized database. To identify each pricing strategy, CREATE a "pricing" table with a "princing_id" PK. Move column titles from "film" to "pricing." Create a FK in the "film" table for the "princing_id." Another column that has different data elements in the film table and are not directly linked to films, is the `rating` column. Creating a `rating table ` including the FK `film_id`
 
 Sakila database with improvements:
+
+{new-sakila-edr}[New Sakila database EDR download]
 
 image::https://user-images.githubusercontent.com/63274055/151713113-6b1efdea-2f12-43a3-83b9-2a97d30df8de.png[width=400]
 
@@ -506,24 +511,22 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 
+
+
+
+
 ====
 ''''
 ====
 
-{script-url}[Solutions script only]
-
-====
-''''
-====
 
 
 
+xref:Lab-Database-Normalization[Top Section]
 
-xref:Lab-xxxx[Top Section]
 
-xref:Last-section[Bottom section]
 
-bla bla blafootnote:[{fn-xxx}]
+//bla bla blafootnote:[{fn-xxx}]
 
 
 ////
