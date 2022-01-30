@@ -76,6 +76,9 @@ image::https://user-images.githubusercontent.com/63274055/151679513-178e534e-e0c
 ====
 ''''
 ====
+
+To do this task I created the model with `MySQL Workbench` and generated the code with the  `Forward engineering` feature.
+
 Remove the duplicate rows of "film_text" from the table "film".
 
 In the "film" table, there are several ambiguous columns. Furthermore, the number of available languages is determined more by the copy version (i.e., inventory) than by film itself. Delete column "language_id" from the "film" table. Create columns "dubbing_language" and "language_subtitles" in the "inventory" table: FK for language id.
