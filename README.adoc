@@ -67,7 +67,7 @@ toc::[]
 === Use dbdiagram.io or draw.io to propose a new structure for the Sakila database.
 === Define primary keys and foreign keys for the new database.
 
-Proposed solutions:
+* Proposed solutions:
 
 This is the original Sakila Database:
 
@@ -81,8 +81,428 @@ The column "special_features" in the table "film" has more than one value per ce
 
 The table "film" has numerous columns that refer to the pricing policy, which is not directly tied to the film. A business must be able to alter its pricing strategy without affecting the "film" table in a normalized database. To identify each pricing strategy, CREATE a "pricing" table with a "princing_id" PK. Move column titles from "film" to "pricing." Create a FK in the "film" table for the "princing_id." Another column that has different data elements in the film table and are not directly linked to films, is the `rating` column. Creating a `rating table ` including the FK `film_id`
 
+Sakila database with improvements:
+
+image::https://user-images.githubusercontent.com/63274055/151713113-6b1efdea-2f12-43a3-83b9-2a97d30df8de.png[width=400]
 
 
+
+
+* Script to create the new version of the sakila database:
+
+```sql
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+
+
+-- -----------------------------------------------------
+-- Schema new_sakila
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `new_sakila` DEFAULT CHARACTER SET utf8 ;
+USE `new_sakila` ;
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`pricing`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`pricing` (
+  `pricing_id` SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rental_rate` DECIMAL(4,2) NOT NULL,
+  `replacement_cost` DECIMAL(5,2) NULL,
+  `rental_duration` TINYINT(3) NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`pricing_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`actor`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`actor` (
+  `actor_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`actor_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`category` (
+  `category_id` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(25) NOT NULL,
+  `last_update` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`category_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`language`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`language` (
+  `language_id` INT NOT NULL AUTO_INCREMENT,
+  `name` CHAR(20) NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`language_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`film`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`film` (
+  `film_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `original_language_id` INT NOT NULL,
+  `description` TEXT NULL,
+  `release_year` YEAR NULL,
+  `duration` SMALLINT UNSIGNED NULL,
+  `pricing_id` SMALLINT(5) UNSIGNED NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`film_id`),
+  INDEX `fk_film_pricing_idx` (`pricing_id` ASC) VISIBLE,
+  INDEX `fk_film1_idx` (`original_language_id` ASC) VISIBLE,
+  CONSTRAINT `fk_film_pricing`
+    FOREIGN KEY (`pricing_id`)
+    REFERENCES `new_sakila`.`pricing` (`pricing_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_film1`
+    FOREIGN KEY (`original_language_id`)
+    REFERENCES `new_sakila`.`language` (`language_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`film_actor`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`film_actor` (
+  `actor_id` SMALLINT UNSIGNED NOT NULL,
+  `film_id` SMALLINT UNSIGNED NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`actor_id`, `film_id`),
+  INDEX `fk_film_actor2_idx` (`actor_id` ASC) VISIBLE,
+  CONSTRAINT `fk_film_actor1`
+    FOREIGN KEY (`film_id`)
+    REFERENCES `new_sakila`.`film` (`film_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_film_actor2`
+    FOREIGN KEY (`actor_id`)
+    REFERENCES `new_sakila`.`actor` (`actor_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`country`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`country` (
+  `country_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `country` VARCHAR(50) NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`country_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`city`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`city` (
+  `city_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `city` VARCHAR(50) NOT NULL,
+  `country_id` SMALLINT UNSIGNED NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`city_id`),
+  INDEX `fk_city1_idx` (`country_id` ASC) VISIBLE,
+  CONSTRAINT `fk_city1`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `new_sakila`.`country` (`country_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`address` (
+  `address_id` SMALLINT NOT NULL AUTO_INCREMENT,
+  `address` VARCHAR(50) NOT NULL,
+  `address_2` VARCHAR(50) NULL,
+  `district` VARCHAR(20) NOT NULL,
+  `city_id` SMALLINT UNSIGNED NOT NULL,
+  `postal_code` VARCHAR(10) NULL,
+  `phone` VARCHAR(20) NOT NULL,
+  `location` GEOMETRY NOT NULL,
+  `last_update` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`address_id`),
+  INDEX `fk_address1_idx` (`city_id` ASC) VISIBLE,
+  CONSTRAINT `fk_address1`
+    FOREIGN KEY (`city_id`)
+    REFERENCES `new_sakila`.`city` (`city_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`staff`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`staff` (
+  `staff_id` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `store_id` TINYINT UNSIGNED NOT NULL,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `address_id` SMALLINT NOT NULL,
+  `picture` BLOB NULL,
+  `email` VARCHAR(50) NULL,
+  `active` TINYINT NOT NULL DEFAULT 1,
+  `username` VARCHAR(16) NOT NULL,
+  `password` VARCHAR(40) NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`staff_id`),
+  INDEX `fk_staff1_idx` (`store_id` ASC) VISIBLE,
+  INDEX `fk_staff2_idx` (`address_id` ASC) VISIBLE,
+  CONSTRAINT `fk_staff1`
+    FOREIGN KEY (`store_id`)
+    REFERENCES `new_sakila`.`store` (`store_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_staff2`
+    FOREIGN KEY (`address_id`)
+    REFERENCES `new_sakila`.`address` (`address_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`store`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`store` (
+  `store_id` TINYINT UNSIGNED NOT NULL,
+  `manager_staff_id` TINYINT UNSIGNED NOT NULL,
+  `address_id` SMALLINT NOT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`store_id`),
+  INDEX `fk_store1_idx` (`manager_staff_id` ASC) VISIBLE,
+  INDEX `fk_store2_idx` (`address_id` ASC) VISIBLE,
+  CONSTRAINT `fk_store1`
+    FOREIGN KEY (`manager_staff_id`)
+    REFERENCES `new_sakila`.`staff` (`staff_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_store2`
+    FOREIGN KEY (`address_id`)
+    REFERENCES `new_sakila`.`address` (`address_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`inventory`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`inventory` (
+  `inventory_id` MEDIUMINT NOT NULL AUTO_INCREMENT,
+  `store_id` TINYINT UNSIGNED NOT NULL,
+  `film_id` SMALLINT UNSIGNED NOT NULL,
+  `language_subtitles_id` INT NULL,
+  `dubbing_language_id` INT NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`inventory_id`),
+  INDEX `fk_inventory1_idx` (`store_id` ASC) VISIBLE,
+  INDEX `fk_inventory2_idx` (`film_id` ASC) VISIBLE,
+  INDEX `fk_inventory3_idx` (`language_subtitles_id` ASC) VISIBLE,
+  INDEX `fk_inventory4_idx` (`dubbing_language_id` ASC) VISIBLE,
+  CONSTRAINT `fk_inventory1`
+    FOREIGN KEY (`store_id`)
+    REFERENCES `new_sakila`.`store` (`store_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_inventory2`
+    FOREIGN KEY (`film_id`)
+    REFERENCES `new_sakila`.`film` (`film_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_inventory3`
+    FOREIGN KEY (`language_subtitles_id`)
+    REFERENCES `new_sakila`.`language` (`language_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_inventory4`
+    FOREIGN KEY (`dubbing_language_id`)
+    REFERENCES `new_sakila`.`language` (`language_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`special_content`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`special_content` (
+  `inventory_id` MEDIUMINT NOT NULL,
+  `behind_scenes` TINYINT NOT NULL DEFAULT 0,
+  `commentaries` TINYINT NOT NULL DEFAULT 0,
+  `deleted_scenes` TINYINT NOT NULL DEFAULT 0,
+  `trailer` TINYINT NOT NULL DEFAULT 0,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`inventory_id`),
+  CONSTRAINT `fk_special_content1`
+    FOREIGN KEY (`inventory_id`)
+    REFERENCES `new_sakila`.`inventory` (`inventory_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`customer`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`customer` (
+  `customer_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `store_id` TINYINT UNSIGNED NOT NULL,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(50) NULL,
+  `address_id` SMALLINT NOT NULL,
+  `active` TINYINT NOT NULL DEFAULT 1,
+  `create_date` DATETIME NOT NULL,
+  `last_updated` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`customer_id`),
+  INDEX `fk_customer1_idx` (`store_id` ASC) VISIBLE,
+  INDEX `fk_customer2_idx` (`address_id` ASC) VISIBLE,
+  CONSTRAINT `fk_customer1`
+    FOREIGN KEY (`store_id`)
+    REFERENCES `new_sakila`.`store` (`store_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_customer2`
+    FOREIGN KEY (`address_id`)
+    REFERENCES `new_sakila`.`address` (`address_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`rental`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`rental` (
+  `rental_id` INT NOT NULL AUTO_INCREMENT,
+  `customer_id` SMALLINT UNSIGNED NOT NULL,
+  `inventory_id` MEDIUMINT NOT NULL,
+  `staff_id` TINYINT UNSIGNED NOT NULL,
+  `rental_date` DATETIME NOT NULL,
+  `return_date` DATETIME NULL,
+  `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`rental_id`),
+  INDEX `fk_rental1_idx` (`customer_id` ASC) VISIBLE,
+  INDEX `fk_rental2_idx` (`inventory_id` ASC) VISIBLE,
+  INDEX `fk_rental3_idx` (`staff_id` ASC) VISIBLE,
+  CONSTRAINT `fk_rental1`
+    FOREIGN KEY (`customer_id`)
+    REFERENCES `new_sakila`.`customer` (`customer_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_rental2`
+    FOREIGN KEY (`inventory_id`)
+    REFERENCES `new_sakila`.`inventory` (`inventory_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_rental3`
+    FOREIGN KEY (`staff_id`)
+    REFERENCES `new_sakila`.`staff` (`staff_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`payment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`payment` (
+  `payment_id` SMALLINT NOT NULL AUTO_INCREMENT,
+  `customer_id` SMALLINT UNSIGNED NOT NULL,
+  `staff_id` TINYINT UNSIGNED NOT NULL,
+  `rental_id` INT NULL,
+  `amount` DECIMAL(5,2) NOT NULL,
+  `payment_date` DATETIME NOT NULL,
+  `last_update` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`payment_id`),
+  INDEX `fk_payment1_idx` (`customer_id` ASC) VISIBLE,
+  INDEX `fk_payment2_idx` (`staff_id` ASC) VISIBLE,
+  INDEX `fk_payment3_idx` (`rental_id` ASC) VISIBLE,
+  CONSTRAINT `fk_payment1`
+    FOREIGN KEY (`customer_id`)
+    REFERENCES `new_sakila`.`customer` (`customer_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_payment2`
+    FOREIGN KEY (`staff_id`)
+    REFERENCES `new_sakila`.`staff` (`staff_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_payment3`
+    FOREIGN KEY (`rental_id`)
+    REFERENCES `new_sakila`.`rental` (`rental_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`film_category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`film_category` (
+  `film_id` SMALLINT UNSIGNED NOT NULL,
+  `category_id` TINYINT UNSIGNED NOT NULL,
+  `last_update` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`film_id`, `category_id`),
+  INDEX `fk_film_category2_idx` (`film_id` ASC) VISIBLE,
+  CONSTRAINT `fk_film_category1`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `new_sakila`.`category` (`category_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_film_category2`
+    FOREIGN KEY (`film_id`)
+    REFERENCES `new_sakila`.`film` (`film_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `new_sakila`.`rating`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `new_sakila`.`rating` (
+  `film_id` SMALLINT UNSIGNED NOT NULL,
+  `rating` ENUM('G', 'PG', 'PG-13', 'R', 'NC-17') NULL,
+  PRIMARY KEY (`film_id`),
+  CONSTRAINT `fk_rating1`
+    FOREIGN KEY (`film_id`)
+    REFERENCES `new_sakila`.`film` (`film_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+```
 
 
 
