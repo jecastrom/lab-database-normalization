@@ -77,7 +77,7 @@ image::https://user-images.githubusercontent.com/63274055/151679513-178e534e-e0c
 ''''
 ====
 
-To do this task I created the model with `MySQL Workbench` and generated the code with the  `Forward engineering` feature.
+To do this task I created the model with `MySQL Workbench` using the `Forward engineering` feature.
 
 I have to remove the duplicate rows of "film_text" from the table "film".
 
@@ -103,7 +103,7 @@ image::https://user-images.githubusercontent.com/63274055/151724137-cd4546b2-ba1
 * Script to create the new version of the sakila database:
 
 ```sql
--- MySQL Workbench Forward Engineering
+
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
