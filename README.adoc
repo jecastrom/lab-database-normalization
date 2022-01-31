@@ -5,7 +5,7 @@
 :my-name: Jorge Castro DAPT NOV2021
 :description:
 :new-sakila-edr: https://github.com/jecastrom/lab-database-normalization/files/7966677/new_sakila.pdf
-//:fn-xxx: Add the explanation foot note here bla bla
+:rel-cont: https://github.com/jecastrom/data_3.04_activities.git
 :toc:
 :toc-title: 
 :toc-placement!:
@@ -52,6 +52,7 @@ image::{image-url-ironhack}[width=70]
 
 {my-name}
 
+{rel-cont}[Related content: Activity 3.04]
 
                                                      
 ====
@@ -521,12 +522,14 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 
+{rel-cont}[Related content: Activity 3.04]
+
 
 ====
 ''''
 ====
 
-
+rel-cont
 
 
 xref:Lab-Database-Normalization[Top Section]
