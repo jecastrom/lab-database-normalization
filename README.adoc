@@ -89,6 +89,8 @@ The column "special_features" in the table "film" has more than one value per ce
 
 The table "film" has numerous columns that refer to the pricing policy, which is not directly tied to the film. A business must be able to alter its pricing strategy without affecting the "film" table in a normalized database. To identify each pricing strategy, CREATE a "pricing" table with a "princing_id" PK. Move column titles from "film" to "pricing." Create a FK in the "film" table for the "princing_id." Another column that has different data elements in the film table and are not directly linked to films, is the `rating` column. Creating a `rating table ` including the FK `film_id`
 
+image::https://user-images.githubusercontent.com/63274055/151723452-2c5e1672-8355-4fe5-b03a-1f60c15bcf69.png[width=800]
+
 Sakila database with improvements:
 
 {new-sakila-edr}[New Sakila database EDR download]
