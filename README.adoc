@@ -95,7 +95,7 @@ Sakila database with improvements:
 
 {new-sakila-edr}[New Sakila database EDR download]
 
-image::https://user-images.githubusercontent.com/63274055/151713113-6b1efdea-2f12-43a3-83b9-2a97d30df8de.png[width=400]
+image::https://user-images.githubusercontent.com/63274055/151724137-cd4546b2-ba1e-4ca9-a825-dce179551075.png[width=400]
 
 
 
