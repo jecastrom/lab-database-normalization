@@ -529,7 +529,6 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 ''''
 ====
 
-rel-cont
 
 
 xref:Lab-Database-Normalization[Top Section]
